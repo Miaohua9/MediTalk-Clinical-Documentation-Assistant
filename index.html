@@ -165,23 +165,181 @@
 </section>
 <!-- End Motivation / Pain point -->
 
- <!-- Result Images with Captions -->
+<!-- System Workflow -->
 <section class="section">
   <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">System Workflow</h2>
+    <div class="columns is-centered">
+      <div class="column is-full">
+        
+        <h2 class="title is-3 has-text-centered">System Workflow</h2>
 
-    <div class="content">
-      <figure>
-        <img src="static/images/meditalk_multi_agent_architecture_4layer.png" alt="2D seagrass segmentation">
-        <figcaption class="has-text-centered">
-          <strong>Figure 1:</strong>  Overview of the proposed point-supervised image segmentation framework 
-        </figcaption>
-      </figure>
+        <div class="content has-text-justified">
+          <p>
+            MediTalk follows an end-to-end voice-to-note workflow. The doctor first selects the patient,
+            doctor, and visit date, then records or enters the clinical content. The system supports both
+            real-time speech transcription during recording and a final transcription path after the recording
+            is stopped. The generated clinical content is then refined, structured, validated, reviewed by the
+            doctor, and saved or exported as part of the patient record.
+          </p>
+        </div>
 
-      <!-- Add more figures here as needed -->
+        <!-- Main workflow figure -->
+        <figure class="image">
+          <img 
+            src="static/images/meditalk_multi_agent_architecture_4layer.png" 
+            alt="MediTalk multi-agent architecture and system workflow">
+        </figure>
+
+        <p class="has-text-centered is-size-6 has-text-grey mt-3">
+          <strong>Figure 1.</strong> MediTalk end-to-end workflow and four-layer multi-agent architecture.
+        </p>
+
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">End-to-End User Workflow</h3>
+
+          <p>
+            The user-facing workflow starts from patient and doctor management, followed by voice input,
+            draft generation, clinical review, and final save/export. The system is designed around the
+            clinic's actual documentation process, where the AI generates a structured draft but the doctor
+            remains in control of the final record.
+          </p>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  <th>Workflow Stage</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td><strong>Patient / Doctor Management</strong></td>
+                  <td>
+                    The doctor selects or manages the patient, doctor profile, and visit information before documentation begins.
+                  </td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td><strong>Voice Input</strong></td>
+                  <td>
+                    The doctor records clinical content through voice input. The interface supports start/stop recording
+                    and real-time transcript display.
+                  </td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td><strong>Speech-to-Text and Correction</strong></td>
+                  <td>
+                    The transcription workflow applies speech-to-text processing and domain-specific correction for
+                    terminology, homophones, and dosage expressions.
+                  </td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td><strong>Clinical Information Extraction</strong></td>
+                  <td>
+                    The system extracts structured clinical information, such as symptoms, diagnosis, treatment,
+                    herbs, acupoints, and clinical advice.
+                  </td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td><strong>Documentation Generation</strong></td>
+                  <td>
+                    The system generates a readable clinical note and SOAP-style documentation in Chinese and English.
+                  </td>
+                </tr>
+                <tr>
+                  <td>6</td>
+                  <td><strong>Validation and Review</strong></td>
+                  <td>
+                    A validation agent checks completeness and consistency, and the doctor reviews and edits the draft
+                    before approval.
+                  </td>
+                </tr>
+                <tr>
+                  <td>7</td>
+                  <td><strong>Save / Export</strong></td>
+                  <td>
+                    After doctor approval, the visit record is saved and can be exported or printed for clinical use.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Speech Subflow</h3>
+
+          <p>
+            The speech workflow contains two paths. The real-time path provides live transcription feedback during
+            recording, while the final path performs a more complete transcription and correction process after the
+            doctor stops recording.
+          </p>
+
+          <div class="columns">
+            <div class="column">
+              <div class="box">
+                <h4 class="title is-5">Realtime Path</h4>
+                <p>
+                  During recording, the frontend calls the realtime transcription route to display a live transcript.
+                  This gives the doctor immediate feedback and supports live correction of terminology, homophones,
+                  and dosage expressions.
+                </p>
+                <ul>
+                  <li>Start recording</li>
+                  <li>Call <code>/ws/realtime-transcribe</code></li>
+                  <li>Display live transcript in the UI</li>
+                  <li>Apply lightweight live correction</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="box">
+                <h4 class="title is-5">Final Path</h4>
+                <p>
+                  After the doctor stops recording, the system runs a more complete transcription and correction
+                  pipeline. The final transcript is then used for clinical extraction and draft generation.
+                </p>
+                <ul>
+                  <li>Stop recording</li>
+                  <li>Call <code>/transcribe-audio</code></li>
+                  <li>Use fallback STT when needed</li>
+                  <li>Finalize post-ASR correction</li>
+                  <li>Call <code>/generate-draft</code></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Backend and Agent Orchestration</h3>
+
+          <p>
+            The backend is implemented with FastAPI and provides routes for realtime transcription, audio
+            transcription, draft generation, visit saving, and history retrieval. The multi-agent layer coordinates
+            transcription, clinical extraction, documentation generation, and validation. External services include
+            realtime STT, fallback file-based STT, LLM APIs, and local rule assets such as glossary, hotwords,
+            homophone rules, and dosage normalization.
+          </p>
+
+          <p>
+            This modular design makes the workflow easier to debug and improve. Each component has a clear
+            responsibility, and the final clinical record is only saved after doctor review.
+          </p>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>
+<!-- End System Workflow -->
 
 <!-- Table Results Carousel -->
 <section class="section">
