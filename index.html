@@ -95,25 +95,75 @@
   </div>
 </section>
   
-<!-- Paper abstract -->
+<!-- Motivation / Pain point -->
 <section class="section hero is-light">
   <div class="container is-max-desktop">
     <div class="columns is-centered has-text-centered">
       <div class="column is-four-fifths">
-        <h2 class="title is-3">Motivation / Pain point</h2>
+        <h2 class="title is-3">Motivation / Pain Point</h2>
+
         <div class="content has-text-justified">
           <p>
-            The project was motivated by a real documentation challenge in a Chinese medicine clinic. Doctors were spending around 10 minutes manually writing each medical record after consultation. This process was time-consuming and difficult to scale during busy clinic hours.
-The workflow also involved several domain-specific challenges. Chinese medicine records contain specialised terms such as herb names, acupoints, dosage expressions, symptoms, and treatment descriptions. These terms are often difficult to type and can be easily misrecognized by general-purpose speech-to-text systems.
-In addition, the clinic needed Chinese medical records for internal clinical use, while English records were also useful for communication with other healthcare providers and patients.
-The goal of MediTalk was therefore not just to transcribe speech, but to convert noisy spoken clinical input into structured, reviewable, bilingual documentation.
+            The project was motivated by a real documentation challenge in a Chinese medicine clinic.
+            Doctors were spending around 10 minutes manually writing each medical record after consultation.
+            This process was time-consuming and difficult to scale during busy clinic hours.
           </p>
+
+          <p>
+            The workflow also involved several domain-specific challenges. Chinese medicine records contain
+            specialised terms such as herb names, acupoints, dosage expressions, symptoms, and treatment descriptions.
+            These terms are often difficult to type and can be easily misrecognized by general-purpose speech-to-text systems.
+          </p>
+
+          <p>
+            In addition, the clinic needed Chinese medical records for internal clinical use, while English records
+            were also useful for communication with other healthcare providers and patients.
+          </p>
+
+          <p>
+            The goal of MediTalk was therefore not just to transcribe speech, but to convert noisy spoken clinical input
+            into structured, reviewable, bilingual documentation.
+          </p>
+
+          <h3 class="title is-5">Key Pain Points and Design Responses</h3>
+
+          <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Pain Point</th>
+                <th>MediTalk Design Response</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Manual documentation took around 10 minutes per record.</td>
+                <td>Designed a voice-driven documentation workflow to reduce typing burden.</td>
+              </tr>
+              <tr>
+                <td>Chinese medicine terms were difficult to type accurately.</td>
+                <td>Built a domain-specific terminology knowledge base for symptoms, herbs, acupoints, and dosage expressions.</td>
+              </tr>
+              <tr>
+                <td>General speech-to-text systems misrecognized herbs, acupoints, and homophones.</td>
+                <td>Added knowledge-grounded ASR post-correction and terminology normalization.</td>
+              </tr>
+              <tr>
+                <td>The clinic needed structured Chinese records and English reports.</td>
+                <td>Generated structured Chinese medical notes first, then produced English reports from the reviewed Chinese record.</td>
+              </tr>
+              <tr>
+                <td>Clinical documentation must remain accurate and accountable.</td>
+                <td>Kept the doctor in the loop for review, editing, and final approval.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+
       </div>
     </div>
   </div>
 </section>
-<!-- End paper abstract -->
+<!-- End Motivation / Pain point -->
 
  <!-- Result Images with Captions -->
 <section class="section">
