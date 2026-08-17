@@ -103,14 +103,10 @@
         <h2 class="title is-3">Motivation / Pain point</h2>
         <div class="content has-text-justified">
           <p>
-            I developed a bilingual speech-to-note clinical documentation assistant for an ACT clinic to help doctors spend less time on paper work. 
-            Normally, each record takes them at least 10 minutes, but with this assistant, they can just speak and get high quality structured clinical reports automatically, 
-            reducing the documentation time to 1-2 minutes per case. The system combines real-time STT fallback, LLM-based post-correction, domain-specific hotword vocabularies, 
-            homophone disambiguation, and dosage normalization to improve transcription quality for clinical terminology and medication details. 
-            A multi-agent backend handles transcription refinement, clinical information extraction, report generation, and validation, 
-            with grounding guardrails to reduce hallucinations and regression tests to improve terminology accuracy and output stability. 
-            The assistant is designed around real outpatient workflow needs and can potentially reduce full case documentation time from about 10 minutes of manual typing to 1–2 minutes with voice input and quick review. 
-            Due to clinic confidentiality, only the high-level workflow and system architecture are shown.
+            The project was motivated by a real documentation challenge in a Chinese medicine clinic. Doctors were spending around 10 minutes manually writing each medical record after consultation. This process was time-consuming and difficult to scale during busy clinic hours.
+The workflow also involved several domain-specific challenges. Chinese medicine records contain specialised terms such as herb names, acupoints, dosage expressions, symptoms, and treatment descriptions. These terms are often difficult to type and can be easily misrecognized by general-purpose speech-to-text systems.
+In addition, the clinic needed Chinese medical records for internal clinical use, while English records were also useful for communication with other healthcare providers and patients.
+The goal of MediTalk was therefore not just to transcribe speech, but to convert noisy spoken clinical input into structured, reviewable, bilingual documentation.
           </p>
         </div>
       </div>
