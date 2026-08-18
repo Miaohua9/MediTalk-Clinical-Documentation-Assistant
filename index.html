@@ -438,6 +438,180 @@
 </section>
 <!-- End Knowledge-Grounded ASR Post-Correction -->
 
+<!-- Structured Clinical Information Extraction -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-full">
+
+        <h2 class="title is-3 has-text-centered">
+          Structured Clinical Information Extraction
+        </h2>
+
+        <div class="content has-text-justified">
+          <p>
+            After MediTalk produces a corrected transcript from the speech-to-text and medical terminology
+            post-correction pipeline, the structured extraction module converts free-form clinical dictation
+            into a structured intermediate clinical representation. This layer separates clinical understanding
+            from final documentation generation, so the system can check source support, repair field-level issues,
+            and generate reviewable Chinese notes, English reports, and SOAP-style documentation.
+          </p>
+
+          <p>
+            The primary extraction path reuses knowledge-grounded structured hints generated during ASR
+            post-correction. These hints are converted into a richer internal structure called the
+            <strong>VisitSemanticFrame</strong>, which captures chief complaint, history, objective findings,
+            TCM assessment, treatment principle, therapies, herbal medication, advice, follow-up, source evidence,
+            repair logs, and review issues.
+          </p>
+
+          <p>
+            MediTalk also keeps a legacy keyword and rule-based extraction path as a stable fallback. When the
+            semantic extraction path has low confidence, incomplete coverage, or is not suitable for an explicitly
+            sectioned transcript, the system can fall back to a simpler <strong>ClinicalExtractionResult</strong>
+            schema for downstream documentation. This keeps the workflow robust while allowing the system to use
+            a richer semantic layer when appropriate.
+          </p>
+        </div>
+
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Extraction Workflow</h3>
+
+          <div class="box">
+            <p class="has-text-centered is-size-5">
+              <strong>Corrected Transcript</strong>
+              &nbsp; → &nbsp;
+              <strong>Knowledge Structured Hints</strong>
+              &nbsp; → &nbsp;
+              <strong>VisitSemanticFrame</strong>
+              &nbsp; → &nbsp;
+              <strong>Semantic Repair + Source Evidence Guard</strong>
+              &nbsp; → &nbsp;
+              <strong>Clinical Draft</strong>
+            </p>
+          </div>
+
+          <p class="has-text-centered is-size-6 has-text-grey">
+            <strong>Figure / Workflow.</strong> MediTalk structured clinical extraction workflow from corrected
+            transcript to evidence-checked draft notes.
+          </p>
+        </div>
+
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Structured Output Schema</h3>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Structured Component</th>
+                  <th>What It Captures</th>
+                  <th>Why It Matters</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>VisitSemanticFrame</strong></td>
+                  <td>
+                    A rich semantic structure for symptoms, history, findings, assessment, treatment,
+                    medication, advice, and follow-up.
+                  </td>
+                  <td>
+                    Provides documentation generation with a clinically meaningful intermediate representation.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Knowledge Structured Hints</strong></td>
+                  <td>
+                    Structured fields reused from the ASR knowledge repair stage, including complaint, exam,
+                    syndrome, prescription, and advice hints.
+                  </td>
+                  <td>
+                    Reduces repeated extraction work and starts from terminology-grounded metadata.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Legacy Extraction</strong></td>
+                  <td>
+                    Keyword and rule-based <code>ClinicalExtractionAgent.extract()</code> output.
+                  </td>
+                  <td>
+                    Provides a stable fallback when the richer semantic path is unavailable or less suitable.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Semantic Repair</strong></td>
+                  <td>
+                    Moves medication, treatment, assessment, or objective finding text out of incorrect fields.
+                  </td>
+                  <td>
+                    Reduces field contamination before the system writes the clinical note.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Source Evidence Validation</strong></td>
+                  <td>
+                    Checks whether extracted TCM assessment, herbs, doses, acupoints, advice, and follow-up
+                    details are supported by the transcript.
+                  </td>
+                  <td>
+                    Removes or flags unsupported information before downstream report generation.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>ClinicalExtractionResult</strong></td>
+                  <td>
+                    Backward-compatible structured note schema used by the existing documentation and frontend
+                    workflow.
+                  </td>
+                  <td>
+                    Keeps downstream interfaces stable while allowing a richer semantic layer internally.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Validation + Coverage Flags</strong></td>
+                  <td>
+                    Warnings for missing facts, unsupported evidence, field contamination, incomplete medication
+                    details, or English report issues.
+                  </td>
+                  <td>
+                    Supports doctor review before the visit record is saved.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Why This Module Is Important</h3>
+
+          <p>
+            This module is more than a keyword extractor. It combines knowledge reuse, semantic structuring,
+            deterministic repair, source-grounding checks, and fallback design. This makes the generated medical
+            record easier to review, safer to translate, and more reliable for a bilingual clinical documentation
+            workflow.
+          </p>
+
+          <p>
+            The same design pattern is transferable to other regulated AI workflows. Instead of asking an LLM
+            to directly write the final answer, the system first creates a structured, reviewable,
+            evidence-aware representation, and then uses that structure for final document generation.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Structured Clinical Information Extraction -->
+
   
 <!-- Result Images with Captions -->
 <section class="section">
