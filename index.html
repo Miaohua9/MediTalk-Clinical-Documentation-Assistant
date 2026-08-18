@@ -341,23 +341,103 @@
 </section>
 <!-- End System Workflow -->
 
-<!-- Table Results Carousel -->
-<section class="section">
+<!-- Knowledge-Grounded ASR Post-Correction -->
+<section class="section hero is-light">
   <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Knowledge-Grounded ASR Post-Correction</h2>
-    <div id="table-carousel" class="carousel results-carousel">
+    <div class="columns is-centered">
+      <div class="column is-full">
 
-      <!-- Table 1 -->
-      <div class="item has-text-centered">
-        <img src="static/images/asr_post_correction_flow.png" alt="Performance Table 1"
-             style="max-width: 100%; height: auto;" />
-        <h2 class="subtitle has-text-centered mt-4">
-          <strong>Table 1:</strong> Knowledge-Grounded ASR Post-Correction Workflow.
+        <h2 class="title is-3 has-text-centered">
+          Knowledge-Grounded ASR Post-Correction
         </h2>
+
+        <div class="content has-text-justified">
+          <p>
+            A key technical challenge in MediTalk was that general-purpose speech-to-text systems were not reliable
+            enough for Chinese medicine documentation. The raw transcript often contained errors in herb names,
+            acupoints, dosage expressions, and homophones. These errors could affect downstream clinical information
+            extraction and structured note generation.
+          </p>
+
+          <p>
+            To improve reliability, I designed a knowledge-grounded ASR post-correction layer. Instead of relying only
+            on the original speech-to-text output, the system uses a domain-specific medical terminology knowledge base
+            containing symptoms, herb names, acupoints, dosage normalization rules, hotwords, homophone rules, and common
+            ASR error mappings.
+          </p>
+
+          <p>
+            After the initial transcript is generated, the correction layer retrieves or references candidate terms from
+            the knowledge base, uses the surrounding clinical context to disambiguate possible corrections, and normalizes
+            the transcript before clinical extraction. The goal is not to let the LLM freely rewrite the doctor’s speech,
+            but to guide the correction process using controlled domain knowledge.
+          </p>
+        </div>
+
+        <!-- Figure -->
+        <figure class="image">
+          <img 
+            src="static/images/asr_post_correction_flow.png" 
+            alt="Knowledge-grounded ASR post-correction workflow for MediTalk">
+        </figure>
+
+        <p class="has-text-centered is-size-6 has-text-grey mt-3">
+          <strong>Figure 2.</strong> Knowledge-grounded ASR post-correction layer for domain-specific clinical speech documentation.
+        </p>
+
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Knowledge Sources Used for Correction</h3>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Knowledge Source</th>
+                  <th>Purpose in Post-Correction</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Symptoms and clinical phrases</strong></td>
+                  <td>Help normalize common symptom descriptions and improve structured clinical extraction.</td>
+                </tr>
+                <tr>
+                  <td><strong>Chinese herb names</strong></td>
+                  <td>Correct rare or easily misrecognized herb names in the raw transcript.</td>
+                </tr>
+                <tr>
+                  <td><strong>Acupoints and treatment terms</strong></td>
+                  <td>Improve recognition of acupuncture points and treatment-related terminology.</td>
+                </tr>
+                <tr>
+                  <td><strong>Dosage normalization rules</strong></td>
+                  <td>Standardize dosage expressions and reduce ambiguity in medication instructions.</td>
+                </tr>
+                <tr>
+                  <td><strong>Hotwords, aliases, and homophone rules</strong></td>
+                  <td>Handle domain-specific pronunciation variations, aliases, and Chinese homophone errors.</td>
+                </tr>
+                <tr>
+                  <td><strong>Common ASR error mappings</strong></td>
+                  <td>Map frequently observed speech-to-text mistakes back to the most plausible clinical terms.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p>
+            This design reflects a research-to-practice principle: for domain-specific LLM applications, reliability often
+            comes from combining model capability with external structure, domain knowledge, validation rules, and human
+            review, rather than relying on a single model response.
+          </p>
+        </div>
+
       </div>
     </div>
   </div>
 </section>
+<!-- End Knowledge-Grounded ASR Post-Correction -->
+
   
 <!-- Result Images with Captions -->
 <section class="section">
