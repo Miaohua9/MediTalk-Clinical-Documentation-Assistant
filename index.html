@@ -636,23 +636,370 @@
 <!-- End Structured Clinical Information Extraction -->
 
   
-<!-- Result Images with Captions -->
-<section class="section">
+<!-- Evaluation Framework and Pilot Results -->
+<section class="section hero is-light">
   <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Multi-Agent Architecture</h2>
+    <div class="columns is-centered">
+      <div class="column is-full">
 
-    <div class="content">
-      <figure>
-        <img src="static/images/meditalk_multi_agent_architecture_4layer.png" alt="2D seagrass segmentation">
-        <figcaption class="has-text-centered">
-          <strong>Figure 1:</strong>  Performance comparison with the public available CHAMELEON, CAMO, and COD10K datasets.
-        </figcaption>
-      </figure>
+        <h2 class="title is-3 has-text-centered">
+          Evaluation Framework and Pilot Results
+        </h2>
 
-      <!-- Add more figures here as needed -->
+        <div class="content has-text-justified">
+          <p>
+            The MediTalk evaluation framework evaluates the full clinical documentation pipeline through a
+            reproducible offline process. The current pilot evaluation uses 25 clinician-provided recordings
+            with corresponding gold transcripts and structured clinical gold files.
+          </p>
+
+          <p>
+            Instead of rerunning models for every evaluation, the framework reads archived system runs and
+            compares them against gold references. This makes the results more stable, auditable, and useful
+            for regression tracking as the system evolves.
+          </p>
+
+          <p>
+            The evaluation is intentionally layered. It separately measures transcript quality, structured
+            clinical extraction quality, and final Chinese report quality. This helps locate whether an error
+            comes from ASR, knowledge-grounded post-correction, semantic extraction, or the report generation stage.
+          </p>
+
+          <p>
+            A no-postprocessing baseline is also included. It compares raw STT text from audit sidecars with
+            the final postprocessed transcript, so the project can quantify how much the knowledge-grounded repair
+            layer improves character accuracy, herbal term retention, and acupoint recognition.
+          </p>
+        </div>
+
+        <!-- Evaluation Workflow -->
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Evaluation Workflow</h3>
+
+          <p>
+            The evaluation workflow starts from gold clinical cases and archived system runs, then applies
+            layered metrics, clinical matching, error analysis, cost analysis, and improvement decisions.
+          </p>
+
+          <figure class="image">
+            <img
+              src="static/images/evaluation_process_flow.png"
+              alt="MediTalk system evaluation workflow from gold cases and archived runs to layered metrics, error analysis, cost analysis, and improvement decisions">
+          </figure>
+
+          <p class="has-text-centered is-size-6 has-text-grey mt-3">
+            <strong>Figure 4.</strong> MediTalk evaluation workflow from gold cases and archived system runs to layered metrics, error analysis, cost analysis, and improvement decisions.
+          </p>
+        </div>
+
+        <!-- Core Evaluation Pipeline -->
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Core Evaluation Pipeline</h3>
+
+          <div class="box">
+            <p class="has-text-centered is-size-5">
+              <strong>Gold Cases</strong>
+              &nbsp; → &nbsp;
+              <strong>Archived System Runs</strong>
+              &nbsp; → &nbsp;
+              <strong>Layered Evaluation</strong>
+              &nbsp; → &nbsp;
+              <strong>Clinical Matching</strong>
+              &nbsp; → &nbsp;
+              <strong>Error + Cost Analysis</strong>
+              &nbsp; → &nbsp;
+              <strong>Improvement Decisions</strong>
+            </p>
+          </div>
+        </div>
+
+        <!-- Evaluation Layers -->
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Evaluation Layers</h3>
+
+          <p>
+            The evaluation is divided into multiple layers so that errors can be traced to the specific stage
+            where they occur. This is important for improving a multi-stage LLM workflow, because transcript errors,
+            extraction errors, and final report errors require different fixes.
+          </p>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Evaluation Layer</th>
+                  <th>What It Compares</th>
+                  <th>Main Metrics</th>
+                  <th>What It Diagnoses</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td><strong>Layer 1: Transcript Accuracy</strong></td>
+                  <td>
+                    <code>transcript_gold.txt</code> vs
+                    <code>system/transcript_system.txt</code>
+                  </td>
+                  <td>
+                    CER, character accuracy, herbal term recall, acupoint recall / F1.
+                  </td>
+                  <td>
+                    Whether ASR and post-correction preserve the dictated clinical content.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Layer 2: Structured Extraction</strong></td>
+                  <td>
+                    <code>structured_gold_v2_knowledge.json</code> vs
+                    <code>semantic_frame</code> in <code>draft.json</code>
+                  </td>
+                  <td>
+                    Symptom recall / F1, TCM assessment, herbs + dosages, acupoints,
+                    and follow-up components.
+                  </td>
+                  <td>
+                    Whether transcript facts are correctly converted into structured clinical fields.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Layer 3: Final Report</strong></td>
+                  <td>
+                    Structured gold vs generated Chinese readable note sections.
+                  </td>
+                  <td>
+                    Missing facts, unsupported facts, high-risk omissions, and high-risk additions.
+                  </td>
+                  <td>
+                    Whether clinically important facts survive into the doctor-facing report.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>No-Postprocessing Baseline</strong></td>
+                  <td>
+                    Raw STT audit text vs postprocessed transcript, both compared with gold transcript.
+                  </td>
+                  <td>
+                    Raw vs postprocessed CER, character accuracy, herbal recall, and acupoint recall / F1.
+                  </td>
+                  <td>
+                    How much the knowledge-grounded post-correction module improves raw STT output.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Cost Evaluation</strong></td>
+                  <td>
+                    <code>cost/cost_summary.json</code> across archived runs.
+                  </td>
+                  <td>
+                    STT cost, knowledge repair cost, Chinese note cost, English translation cost,
+                    and full bilingual workflow cost.
+                  </td>
+                  <td>
+                    Helps understand the quality-cost trade-off for future workflow scaling.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Representative Pilot Results -->
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Representative Pilot Results</h3>
+
+          <p>
+            The following results are from the current pilot evaluation set and may be updated as more
+            clinician-reviewed cases are added. The results show that the knowledge-grounded post-correction
+            and structured extraction pipeline improved the preservation of key clinical information.
+          </p>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>Result</th>
+                  <th>Interpretation</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td><strong>Layer 1 CER</strong></td>
+                  <td><code>18.36%</code></td>
+                  <td>
+                    Shows transcript-level error after post-correction, with substantial reduction
+                    from the raw STT baseline while still leaving room for further transcript-level improvement.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Layer 1 herbal recall</strong></td>
+                  <td><code>97.62%</code></td>
+                  <td>
+                    Most herbal medicine terms are preserved after post-correction.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Layer 1 acupoint F1</strong></td>
+                  <td><code>98.84%</code></td>
+                  <td>
+                    Acupoint recognition remains highly reliable after correction.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Layer 2 herb + dosage F1</strong></td>
+                  <td><code>97.26%</code></td>
+                  <td>
+                    Medication and dosage facts are usually captured correctly in the semantic frame.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Layer 3 herb + dosage F1</strong></td>
+                  <td><code>96.02%</code></td>
+                  <td>
+                    Most medication facts survive from structured extraction into the final report.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Raw STT CER → postprocessed CER</strong></td>
+                  <td><code>53.70% → 18.38%</code></td>
+                  <td>
+                    The no-postprocessing baseline shows the value of the knowledge-grounded repair pipeline.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>Raw acupoint recall → postprocessed acupoint recall</strong></td>
+                  <td><code>81.40% → 98.84%</code></td>
+                  <td>
+                    Knowledge-grounded repair greatly improves acupoint term retention.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Evaluation Summary Cards -->
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Evaluation Highlights</h3>
+
+          <div class="columns">
+            <div class="column">
+              <div class="box has-text-centered">
+                <p class="heading">Raw STT CER</p>
+                <p class="title is-4">53.70%</p>
+                <p class="is-size-7 has-text-grey">Before post-correction</p>
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="box has-text-centered">
+                <p class="heading">Postprocessed CER</p>
+                <p class="title is-4">18.38%</p>
+                <p class="is-size-7 has-text-grey">After knowledge-grounded repair</p>
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="box has-text-centered">
+                <p class="heading">Herbal Recall</p>
+                <p class="title is-4">97.62%</p>
+                <p class="is-size-7 has-text-grey">After post-correction</p>
+              </div>
+            </div>
+
+            <div class="column">
+              <div class="box has-text-centered">
+                <p class="heading">Acupoint F1</p>
+                <p class="title is-4">98.84%</p>
+                <p class="is-size-7 has-text-grey">After post-correction</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Practical Workflow Benefit -->
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Practical Workflow Benefit</h3>
+
+          <p>
+            In addition to information capture and report quality, MediTalk was also assessed for practical
+            workflow benefit. Manual documentation typically took around 10 minutes per record. With MediTalk,
+            the documentation process was reduced to around 1–2 minutes per record, including doctor review.
+          </p>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+              <thead>
+                <tr>
+                  <th>Workflow</th>
+                  <th>Approximate Time per Record</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td><strong>Manual documentation</strong></td>
+                  <td>Around 10 minutes</td>
+                  <td>
+                    Doctor manually writes the medical record after consultation.
+                  </td>
+                </tr>
+
+                <tr>
+                  <td><strong>MediTalk workflow</strong></td>
+                  <td>Around 1–2 minutes</td>
+                  <td>
+                    AI generates a structured draft; the doctor reviews, edits, and approves the final record.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Why This Evaluation Design Matters -->
+        <div class="content has-text-justified mt-5">
+          <h3 class="title is-4">Why This Evaluation Design Matters</h3>
+
+          <p>
+            The evaluation does not hide the system behind a single overall score. By separating transcript
+            accuracy, structured extraction quality, final report accuracy, raw-vs-post ablation, per-case
+            error details, and cost, it gives the team a practical map for deciding what to improve next.
+          </p>
+
+          <p>
+            This design is especially important for clinical AI systems. The evaluation tracks not only recall
+            and F1, but also missing facts, unsupported additions, and high-risk omissions such as herbs,
+            dosages, and acupoints. These outputs make the system easier to audit, safer to review, and more
+            suitable for iterative medical documentation development.
+          </p>
+
+          <p>
+            The same evaluation mindset is transferable to enterprise AI workflows. In regulated domains such
+            as banking, a reliable GenAI system should be evaluated not only by final answer quality, but also
+            by source grounding, structured extraction accuracy, missing or unsupported facts, human review
+            effort, and operational cost.
+          </p>
+        </div>
+
+      </div>
     </div>
   </div>
 </section>
+<!-- End Evaluation Framework and Pilot Results -->
 
 <!-- Visual Results Carousel -->
 <section class="section">
