@@ -341,6 +341,7 @@
 </section>
 <!-- End System Workflow -->
 
+
 <!-- Knowledge-Grounded ASR Post-Correction -->
 <section class="section hero is-light">
   <div class="container is-max-desktop">
@@ -354,30 +355,37 @@
         <div class="content has-text-justified">
           <p>
             A key technical challenge in MediTalk was that general-purpose speech-to-text systems were not reliable
-            enough for Chinese medicine documentation. The raw transcript often contained errors in herb names,
-            acupoints, dosage expressions, and homophones. These errors could affect downstream clinical information
-            extraction and structured note generation.
+            enough for Chinese medicine documentation. The raw transcript could contain errors in herb names,
+            acupoints, dosage expressions, and homophones. These errors were especially important because they could
+            propagate into downstream clinical extraction, bilingual documentation, and SOAP-style note generation.
           </p>
 
           <p>
-            To improve reliability, I designed a knowledge-grounded ASR post-correction layer. Instead of relying only
-            on the original speech-to-text output, the system uses a domain-specific medical terminology knowledge base
-            containing symptoms, herb names, acupoints, dosage normalization rules, hotwords, homophone rules, and common
-            ASR error mappings.
+            To improve reliability, I designed a knowledge-grounded ASR post-correction layer. Instead of treating the
+            speech-to-text output as final, the system checks the raw transcript against a domain-specific medical
+            terminology knowledge base. This knowledge base includes symptoms, Chinese herb names, acupoints, treatment
+            terms, dosage normalization rules, hotwords, aliases, homophone rules, and common ASR error mappings.
           </p>
 
           <p>
-            After the initial transcript is generated, the correction layer retrieves or references candidate terms from
-            the knowledge base, uses the surrounding clinical context to disambiguate possible corrections, and normalizes
-            the transcript before clinical extraction. The goal is not to let the LLM freely rewrite the doctor’s speech,
-            but to guide the correction process using controlled domain knowledge.
+            The correction layer performs candidate term matching, context-aware disambiguation, terminology
+            normalization, and lightweight validation. The output is not only a cleaner transcript, but also a set of
+            terminology-grounded structured hints, such as possible complaint, examination, syndrome, prescription,
+            treatment, and advice fields. These hints are then reused by the structured clinical extraction module to
+            build a richer semantic representation of the visit.
+          </p>
+
+          <p>
+            The key design principle is that the LLM is not asked to freely rewrite the doctor’s speech. Instead, the
+            correction process is guided by controlled domain knowledge and clinical context. This makes the downstream
+            documentation workflow more stable, reviewable, and easier to validate.
           </p>
         </div>
 
         <!-- Figure -->
         <figure class="image">
-          <img 
-            src="static/images/asr_post_correction_flow.png" 
+          <img
+            src="static/images/meditalk_knowledge_grounded_asr_post_correction.svg"
             alt="Knowledge-grounded ASR post-correction workflow for MediTalk">
         </figure>
 
@@ -394,41 +402,53 @@
                 <tr>
                   <th>Knowledge Source</th>
                   <th>Purpose in Post-Correction</th>
+                  <th>Downstream Use</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td><strong>Symptoms and clinical phrases</strong></td>
-                  <td>Help normalize common symptom descriptions and improve structured clinical extraction.</td>
+                  <td>Normalize common symptom descriptions and clinical expressions.</td>
+                  <td>Supports complaint, history, and symptom extraction.</td>
                 </tr>
+
                 <tr>
                   <td><strong>Chinese herb names</strong></td>
                   <td>Correct rare or easily misrecognized herb names in the raw transcript.</td>
+                  <td>Supports herbal medication and prescription fields.</td>
                 </tr>
+
                 <tr>
                   <td><strong>Acupoints and treatment terms</strong></td>
                   <td>Improve recognition of acupuncture points and treatment-related terminology.</td>
+                  <td>Supports therapy and treatment detail extraction.</td>
                 </tr>
+
                 <tr>
                   <td><strong>Dosage normalization rules</strong></td>
                   <td>Standardize dosage expressions and reduce ambiguity in medication instructions.</td>
+                  <td>Supports medication review and safer bilingual reporting.</td>
                 </tr>
+
                 <tr>
                   <td><strong>Hotwords, aliases, and homophone rules</strong></td>
-                  <td>Handle domain-specific pronunciation variations, aliases, and Chinese homophone errors.</td>
+                  <td>Handle domain-specific pronunciation variation, aliases, and Chinese homophone errors.</td>
+                  <td>Improves terminology consistency before structured extraction.</td>
                 </tr>
+
                 <tr>
                   <td><strong>Common ASR error mappings</strong></td>
-                  <td>Map frequently observed speech-to-text mistakes back to the most plausible clinical terms.</td>
+                  <td>Map frequently observed speech-to-text mistakes back to plausible clinical terms.</td>
+                  <td>Provides terminology-grounded structured hints for the semantic extraction layer.</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
           <p>
-            This design reflects a research-to-practice principle: for domain-specific LLM applications, reliability often
-            comes from combining model capability with external structure, domain knowledge, validation rules, and human
-            review, rather than relying on a single model response.
+            This design reflects a research-to-practice principle: for domain-specific LLM systems, reliability often
+            comes from combining model capability with external domain structure, controlled terminology, validation
+            rules, fallback mechanisms, and human review.
           </p>
         </div>
 
