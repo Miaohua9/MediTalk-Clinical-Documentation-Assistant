@@ -295,68 +295,6 @@
           </div>
         </div>
 
-        <div class="content has-text-justified mt-5">
-          <h3 class="title is-4">Speech Subflow</h3>
-
-          <p>
-            The speech workflow contains two paths. The real-time path provides live transcription feedback during
-            recording, while the final path performs a more complete transcription and correction process after the
-            doctor stops recording.
-          </p>
-
-          <div class="columns">
-            <div class="column">
-              <div class="box">
-                <h4 class="title is-5">Realtime Path</h4>
-                <p>
-                  During recording, the frontend calls the realtime transcription route to display a live transcript.
-                  This gives the doctor immediate feedback and supports live correction of terminology, homophones,
-                  and dosage expressions.
-                </p>
-                <ul>
-                  <li>Start recording</li>
-                  <li>Call realtime-transcribe</li>
-                  <li>Display live transcript in the UI</li>
-                  <li>Apply lightweight live correction</li>
-                </ul>
-              </div>
-            </div>
-
-            <div class="column">
-              <div class="box">
-                <h4 class="title is-5">Final Path</h4>
-                <p>
-                  After the doctor stops recording, the system runs a more complete transcription and correction
-                  pipeline. The final transcript is then used for clinical extraction and draft generation.
-                </p>
-                <ul>
-                  <li>Stop recording</li>
-                  <li>Use fallback STT when needed</li>
-                  <li>Apply post-ASR correction with terminology knowledge database</li>
-                  <li>Generate corrected draft</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="content has-text-justified mt-5">
-          <h3 class="title is-4">Backend and Agent Orchestration</h3>
-
-          <p>
-            The backend is implemented with FastAPI and provides routes for realtime transcription, audio
-            transcription, draft generation, visit saving, and history retrieval. The multi-agent layer coordinates
-            transcription, clinical extraction, documentation generation, and validation. External services include
-            realtime STT, fallback file-based STT, LLM APIs, and local rule assets such as glossary, hotwords,
-            homophone rules, and dosage normalization.
-          </p>
-
-          <p>
-            This modular design makes the workflow easier to debug and improve. Each component has a clear
-            responsibility, and the final clinical record is only saved after doctor review.
-          </p>
-        </div>
-
       </div>
     </div>
   </div>
