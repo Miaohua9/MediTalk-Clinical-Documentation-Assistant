@@ -314,7 +314,7 @@
 
         <div class="content has-text-justified">
           <p>
-            A key technical challenge in MediTalk was that general-purpose speech-to-text systems were not reliable
+            A key technical challenge in MediTalk was that general-purpose speech-to-text model were not reliable
             enough for Chinese medicine documentation. The raw transcript could contain errors in herb names,
             acupoints, dosage expressions, and homophones. These errors were especially important because they could
             propagate into downstream clinical extraction, bilingual documentation, and SOAP-style note generation.
@@ -324,7 +324,7 @@
             To improve reliability, I designed a knowledge-grounded ASR post-correction layer. Instead of treating the
             speech-to-text output as final, the system checks the raw transcript against a domain-specific medical
             terminology knowledge base. This knowledge base includes symptoms, Chinese herb names, acupoints, treatment
-            terms, dosage normalization rules, hotwords, aliases, homophone rules, and common ASR error mappings.
+            terms, dosage normalization rules, hotwords, homophone rules, and common ASR error mappings due to doctors' accent and habit.
           </p>
 
           <p>
